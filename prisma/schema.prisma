@@ -1,0 +1,38 @@
+// Fichier: prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // L'URL de votre base de données sera dans un fichier .env
+}
+
+// Modèle pour vos clients (les artisans)
+model Tenant {
+  id               String   @id @default(uuid())
+  companyName      String
+  ownerEmail       String   @unique
+  stripeCustomerId String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  agents Agent[] // Chaque client peut avoir plusieurs agents/standardistes
+}
+
+// Modèle pour les agents IA configurés par vos clients
+model Agent {
+  id                  String   @id @default(uuid())
+  name                String   @default("Assistant IA")
+  systemPrompt        String?  @db.Text
+  voiceId             String?  // Ex: ID de la voix ElevenLabs
+  twilioPhoneNumber   String?  @unique
+  elevenlabsAgentId   String?  @unique // ID de l'agent conversationnel
+  calendlyLink        String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}

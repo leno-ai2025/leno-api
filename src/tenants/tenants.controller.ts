@@ -1,11 +1,9 @@
-// Fichier: src/tenants/tenants.controller.ts
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { TenantsService } from './tenants.service';
+import { AuthGuard } from '@nestjs/passport';
 
-// Ceci définit la forme des données que l'on attend du frontend
 class CreateTenantDto {
-  companyName: string;
-  ownerEmail: string;
+  companyName: string; 
 }
 
 @Controller('tenants')
@@ -13,7 +11,10 @@ export class TenantsController {
   constructor(private readonly tenantsService: TenantsService) {}
 
   @Post()
-  create(@Body() createTenantDto: CreateTenantDto) {
-    return this.tenantsService.create(createTenantDto);
+  @UseGuards(AuthGuard())
+  create(@Request() req, @Body() createTenantDto: CreateTenantDto) {
+    const userId = req.user.userId;
+    // On passe bien le userId et le DTO
+    return this.tenantsService.create(userId, createTenantDto);
   }
 }

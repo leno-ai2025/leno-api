@@ -6,10 +6,12 @@ import { PrismaService } from '../prisma/prisma.service';
 export class TenantsService {
   constructor(private prisma: PrismaService) {}
 
-  // Crée un nouveau tenant (client) dans la base de données
-  create(data: { companyName: string; ownerEmail: string }) {
+  create(userId: string, data: { companyName: string }) {
     return this.prisma.tenant.create({
-      data,
+      data: {
+        companyName: data.companyName,
+        userId: userId, // On enregistre l'ID de l'utilisateur
+      },
     });
   }
 }

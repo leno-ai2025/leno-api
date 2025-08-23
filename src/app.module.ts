@@ -1,12 +1,19 @@
 // Fichier: src/app.module.ts
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaModule } from './prisma/prisma.module'; // <--- IMPORTEZ ICI
+import { PrismaModule } from './prisma/prisma.module';
 import { TenantsModule } from './tenants/tenants.module';
+import { AuthModule } from './auth/auth.module'; 
 
 @Module({
-  imports: [PrismaModule, TenantsModule], // <--- AJOUTEZ ICI
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    AuthModule, 
+    TenantsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

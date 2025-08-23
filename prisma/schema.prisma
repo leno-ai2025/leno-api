@@ -1,27 +1,36 @@
-// Fichier: prisma/schema.prisma
+// Fichier : prisma/schema.prisma
 
+// Configuration du client Prisma (ne pas modifier)
 generator client {
   provider = "prisma-client-js"
 }
 
+// Configuration de la source de données (lit l'URL depuis le fichier .env)
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") // L'URL de votre base de données sera dans un fichier .env
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
-// Modèle pour vos clients (les artisans)
+// Modèle pour vos clients (les artisans).
+// Chaque "Tenant" représente un compte client dans votre SaaS.
 model Tenant {
   id               String   @id @default(uuid())
   companyName      String
-  ownerEmail       String   @unique
+
+  // Le champ le plus important : il lie ce compte client à un utilisateur unique
+  // dans le système d'authentification de Supabase.
+  userId           String   @unique
+
   stripeCustomerId String?  @unique
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  agents Agent[] // Chaque client peut avoir plusieurs agents/standardistes
+  // Chaque Tenant peut avoir plusieurs Agents (standardistes IA)
+  agents           Agent[]
 }
 
-// Modèle pour les agents IA configurés par vos clients
+// Modèle pour les agents IA configurés par vos clients.
 model Agent {
   id                  String   @id @default(uuid())
   name                String   @default("Assistant IA")
@@ -33,6 +42,7 @@ model Agent {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
+  // Relation retour vers le Tenant : chaque Agent appartient à un seul Tenant.
   tenantId String
   tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }

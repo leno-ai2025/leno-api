@@ -1,11 +1,12 @@
 // Fichier: src/tenants/tenants.module.ts
-
 import { Module } from '@nestjs/common';
 import { TenantsController } from './tenants.controller';
 import { TenantsService } from './tenants.service';
+import { AuthModule } from '../auth/auth.module'; // <--- IMPORTEZ LE NOUVEAU MODULE
 
 @Module({
+  imports: [AuthModule], 
   controllers: [TenantsController],
-  providers: [TenantsService],
+  providers: [TenantsService], 
 })
 export class TenantsModule {}
